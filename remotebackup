@@ -18,22 +18,43 @@
 
 
 
-echo "------------------------"
-echo "--[ Mounting NNVault ]--"
-echo "------------------------"
+echo "----------------------------------------"
+echo "--[ Mounting NNVault & NNRemoteBackup]--"
+echo "----------------------------------------"
 sudo mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
+sudo mount -t cifs //192.168.1.20/nnremotebackup /nnremotebackup/ -o credentials=/home/nn/.smbnnremotebackup
 
 
-echo "----------------------------------"
-echo "--[ Confirming NNVault mounted ]--"
-echo "----------------------------------"
+echo "---------------------------------------------------"
+echo "--[ Confirming NNVault & NNRemoteBackup mounted ]--"
+echo "---------------------------------------------------"
 if grep -qs '/nnvault ' /proc/mounts; then
   echo "NNVault Mounted"
-
+    if grep -qs '/nnremotebackup ' /proc/mounts; then
+      echo "NNRemoteBackup Mounted"
+      echo "--------------------------------"
+      echo "--[ Run Dry-Run Rsync? (y/n) ]--"
+      echo "--------------------------------"
+      read -p ""
+      if [[ $REPLY =~ ^[Yy]$ ]]
+      then
+        sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnremotebackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+      fi
+      echo "-----------------------------"
+      echo "--[ Run Real Rsync? (y/n) ]--"
+      echo "-----------------------------"
+      read -p ""
+      if [[ $REPLY =~ ^[Yy]$ ]]
+      then
+        sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnremotebackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+      fi
+      else
+      echo "Error : NNRemoteBackup Unmounted"
+    fi
   else
   echo "Error : NNVault Unmounted"
 fi
-
 #Cleanup
-sudo umount -t cifs //10.0.100.10/NNVault
-sudo wg-quick down wg0
+#sudo umount -t cifs //10.0.100.10/NNVault
+#sudo umount -t cifs //192.168.1.20/nnremotebackup
+#sudo wg-quick down wg0
