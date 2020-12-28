@@ -38,7 +38,7 @@ if grep -qs '/nnvault ' /proc/mounts; then
       read -p ""
       if [[ $REPLY =~ ^[Yy]$ ]]
       then
-        sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnremotebackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+        sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/
       fi
       echo "-----------------------------"
       echo "--[ Run Real Rsync? (y/n) ]--"
