@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 #     ////     //  ////     //
 #    // //    //  // //    //
 #   //  //   //  //  //   //
@@ -15,16 +15,14 @@
 #echo "-------------------------------"
 #sudo wg-quick up wg0
 #sudo wg
-
-
-
 echo "----------------------------------------"
 echo "--[ Mounting NNVault & NNRemoteBackup]--"
 echo "----------------------------------------"
 sudo mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
+#===========================
+#CHANGE IP
+#===========================
 sudo mount -t cifs //192.168.1.20/nnremotebackup /nnremotebackup/ -o credentials=/home/nn/.smbnnremotebackup
-
-
 echo "---------------------------------------------------"
 echo "--[ Confirming NNVault & NNRemoteBackup mounted ]--"
 echo "---------------------------------------------------"
@@ -55,6 +53,9 @@ if grep -qs '/nnvault ' /proc/mounts; then
   echo "Error : NNVault Unmounted"
 fi
 #Cleanup
-#sudo umount -t cifs //10.0.100.10/NNVault
-#sudo umount -t cifs //192.168.1.20/nnremotebackup
+sudo umount -t cifs //10.0.100.10/NNVault
+#===========================
+#CHANGE IP
+#===========================
+sudo umount -t cifs //192.168.1.20/nnremotebackup
 #sudo wg-quick down wg0
