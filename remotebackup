@@ -9,20 +9,18 @@
 #20200602 - Created script to remotely backup Files
 #20200614 - Added confirmation that disks are mounted and logging file
 #20201227 - Adopted for RemoteBackup
+#20210418 - Corrected script for interview
 #
-#echo "-------------------------------"
-#echo "--[ Connecting to WireGuard ]--"
-#echo "-------------------------------"
-#sudo wg-quick up wg0
-#sudo wg
+echo "----------------------------"
+echo "--[ Connecting WireGuard ]--"
+echo "----------------------------"
+sudo wg-quick up wg0
+sudo wg
 echo "----------------------------------------"
 echo "--[ Mounting NNVault & NNRemoteBackup]--"
 echo "----------------------------------------"
 sudo mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
-#===========================
-#CHANGE IP
-#===========================
-sudo mount -t cifs //192.168.1.20/nnremotebackup /nnremotebackup/ -o credentials=/home/nn/.smbnnremotebackup
+sudo mount -t cifs //192.168.100.10/NNRemoteBackup /nnremotebackup -o credentials=/home/nn/.smbnnremotebackup
 echo "---------------------------------------------------"
 echo "--[ Confirming NNVault & NNRemoteBackup mounted ]--"
 echo "---------------------------------------------------"
@@ -44,7 +42,7 @@ if grep -qs '/nnvault ' /proc/mounts; then
       read -p ""
       if [[ $REPLY =~ ^[Yy]$ ]]
       then
-        sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnremotebackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+        sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnvault/Backup/NNServer/HOME.RemoteBackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
       fi
       else
       echo "Error : NNRemoteBackup Unmounted"
@@ -52,10 +50,11 @@ if grep -qs '/nnvault ' /proc/mounts; then
   else
   echo "Error : NNVault Unmounted"
 fi
+echo "-------------------------------------"
+echo "--[ Disconnecting SMB & WireGuard ]--"
+echo "-------------------------------------"
 #Cleanup
 sudo umount -t cifs //10.0.100.10/NNVault
-#===========================
-#CHANGE IP
-#===========================
-sudo umount -t cifs //192.168.1.20/nnremotebackup
-#sudo wg-quick down wg0
+sudo umount -t cifs //192.168.100.10/nnremotebackup
+sudo wg-quick down wg0
+sudo wg
