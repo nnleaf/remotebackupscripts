@@ -55,6 +55,6 @@ echo "--[ Disconnecting SMB & WireGuard ]--"
 echo "-------------------------------------"
 #Cleanup
 sudo umount -t cifs //10.0.100.10/NNVault
-sudo umount -t cifs //192.168.100.10/nnremotebackup
+sudo umount -t cifs //192.168.100.10/NNRemoteBackup
 sudo wg-quick down wg0
 sudo wg
