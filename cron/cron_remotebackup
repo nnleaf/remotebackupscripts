@@ -1,0 +1,23 @@
+#!/bin/bash
+#     ////     //  ////     //
+#    // //    //  // //    //
+#   //  //   //  //  //   //
+#  //   //  //  //   //  //
+# //    // //  //    // //
+#//     ////  //     ////
+#
+#20210418 - Adopted remotebackup script for cronjob
+#
+#Connect to wireguard
+wg-quick up wg0
+wg
+#Mount NNVault & NNx220
+mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
+mount -t cifs //192.168.100.10/NNRemoteBackup /nnremotebackup -o credentials=/home/nn/.smbnnremotebackup
+#rSync Files to NNx220
+rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnvault/Backup/NNServer/HOME.RemoteBackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+#Cleanup
+umount -t cifs //10.0.100.10/NNVault
+umount -t cifs //192.168.100.10/nnremotebackup
+wg-quick down wg0
+wg
