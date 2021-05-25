@@ -7,19 +7,20 @@
 #//     ////  //     ////
 #
 #20210418 - Adopted remotebackup script for cronjob
+#20210511 - Added date if statement
 #
-#Connect to Wireguard
-wg-quick up wg0
-wg
-#Mount SMB
-mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
-mount -t cifs //192.168.100.10/NNRemoteBackup /nnremotebackup -o credentials=/home/nn/.smbnnremotebackup
-#rSync Files to NNx220
-rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnvault/Backup/NNServer/HOME.RemoteBackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
-#Cleanup logs (Keep 30 days worth)
-find /nnvault/Backup/NNServer/HOME.RemoteBackup/logs/ -mtime +30 -exec rm -rf {} +
-#Unmount SMB & Disconnect Wireguard
-umount -t cifs //10.0.100.10/NNVault
-umount -t cifs //192.168.100.10/NNRemoteBackup
-wg-quick down wg0
-wg
+if [ "$(date '+%a')" == "Mon" ] ; then
+  #Connect to Wireguard
+  wg-quick up wg0
+  #Mount SMB
+  mount -t cifs //10.0.100.10/NNVault /nnvault/ -o credentials=/home/nn/.smbnnvault
+  mount -t cifs //192.168.100.10/NNRemoteBackup /nnremotebackup -o credentials=/home/nn/.smbnnremotebackup
+  #rSync Files to NNx220
+  rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnvault/Backup/NNServer/HOME.RemoteBackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+  #Cleanup logs (Keep 30 days worth)
+  find /nnvault/Backup/NNServer/HOME.RemoteBackup/logs/ -mtime +30 -exec rm -rf {} +
+  #Unmount SMB & Disconnect Wireguard
+  umount -t cifs //10.0.100.10/NNVault
+  umount -t cifs //192.168.100.10/NNRemoteBackup
+  wg-quick down wg0
+fi
