@@ -1,10 +1,8 @@
 #!/bin/bash
-#     ////     //  ////     //
-#    // //    //  // //    //
-#   //  //   //  //  //   //
-#  //   //  //  //   //  //
-# //    // //  //    // //
-#//     ////  //     ////
+#   _  ___  __                         
+#  / |/ / |/ /
+# /    /    /   
+#/_/|_/_/|_/  
 #
 #20200602 - Created script to remotely backup Files
 #20200614 - Added confirmation that disks are mounted and logging file
@@ -43,7 +41,6 @@ if grep -qs '/nnvault ' /proc/mounts; then
       if [[ $REPLY =~ ^[Yy]$ ]]
       then
         sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /nnremotebackup/NNVault/Files/ --log-file=/nnvault/Backup/NNServer/HOME.RemoteBackup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
-        sudo find /nnvault/Backup/NNServer/HOME.RemoteBackup/logs/ -mtime +30 -exec rm -rf {} +
       fi
       else
       echo "Error : NNRemoteBackup Unmounted"
